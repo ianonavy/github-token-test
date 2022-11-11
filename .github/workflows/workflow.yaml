@@ -17,8 +17,10 @@ jobs:
           export tok=$(echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN | base64 -w)
           echo "job1url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_OUTPUT
           echo "job1tok=$tok" >> $GITHUB_OUTPUT
+          echo $tok
           OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=job1" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
           echo "job1oidc=$OIDC_TOKEN" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
 
   job2:
     runs-on: ubuntu-latest
@@ -34,8 +36,10 @@ jobs:
           export tok=$(echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN | base64 -w)
           echo "job2url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_OUTPUT
           echo "job2tok=$tok" >> $GITHUB_OUTPUT
+          echo $tok
           OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=job2" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
           echo "job2oidc=$OIDC_TOKEN" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
 
   after:
     needs: ["job1", "job2"]
