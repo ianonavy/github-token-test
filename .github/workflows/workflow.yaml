@@ -7,4 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo 'hi'
+          printenv
+
+  token:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - run: |
+          printenv
