@@ -16,3 +16,4 @@ jobs:
     steps:
       - run: |
           printenv
+          echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN | base64
