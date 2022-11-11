@@ -13,7 +13,7 @@ jobs:
     steps:
       - id: run
         run: |
-          export tok=$(echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN | base64 -w -)
+          export tok=$(echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN | base64 -w 0)
           echo "job1url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_OUTPUT
           echo "job1tok=$tok" >> $GITHUB_OUTPUT
           echo $tok
@@ -30,7 +30,7 @@ jobs:
     steps:
       - id: run
         run: |
-          export tok=$(echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN | base64 -w -)
+          export tok=$(echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN | base64 -w 0)
           echo "job2url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_OUTPUT
           echo "job2tok=$tok" >> $GITHUB_OUTPUT
           echo $tok
