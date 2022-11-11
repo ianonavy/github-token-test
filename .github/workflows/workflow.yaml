@@ -3,17 +3,40 @@ on:
     branches: ["*"]
 
 jobs:
-  run:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          printenv
-
-  token:
+  job1:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
     steps:
       - run: |
-          printenv
-          echo $ACTIONS_ID_TOKEN_REQUEST_TOKEN | base64 -w 0
+          echo "job1url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_ENV
+          echo "job1tok=$ACTIONS_ID_TOKEN_REQUEST_TOKEN" >> $GITHUB_ENV
+          OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=job1" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
+          echo "job1oidc=$OIDC_TOKEN" >> $GITHUB_ENV
+
+  job2:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - run: |
+          echo "job2url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_ENV
+          echo "job2tok=$ACTIONS_ID_TOKEN_REQUEST_TOKEN" >> $GITHUB_ENV
+          OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=job2" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
+          echo "job2oidc=$OIDC_TOKEN" >> $GITHUB_ENV
+
+  after:
+    needs: ["job1", "job2"]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - run: |
+          echo "$job1url"
+          echo "$job1tok" | base64 -w 0
+          echo "$job2url"
+          echo "$job2tok" | base64 -w 0
+
+          curl -v "${job1url}&audience=after" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $job1tok"
+          curl -v "${job1url}&audience=after" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $job2tok"
+          curl -v "${job2url}&audience=after" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $job1tok"
