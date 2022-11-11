@@ -7,23 +7,33 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+    outputs:
+      url: ${{ steps.run.outputs.job1url }}
+      tok: ${{ steps.run.outputs.job1tok }}
+      oidc: ${{ steps.run.outputs.job1oidc }}
     steps:
-      - run: |
-          echo "job1url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_ENV
-          echo "job1tok=$ACTIONS_ID_TOKEN_REQUEST_TOKEN" >> $GITHUB_ENV
+      - id: run
+        run: |
+          echo "job1url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_OUTPUT
+          echo "job1tok=$ACTIONS_ID_TOKEN_REQUEST_TOKEN" >> $GITHUB_OUTPUT
           OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=job1" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
-          echo "job1oidc=$OIDC_TOKEN" >> $GITHUB_ENV
+          echo "job1oidc=$OIDC_TOKEN" >> $GITHUB_OUTPUT
 
   job2:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+    outputs:
+      url: ${{ steps.run.outputs.job2url }}
+      tok: ${{ steps.run.outputs.job2tok }}
+      oidc: ${{ steps.run.outputs.job2oidc }}
     steps:
-      - run: |
-          echo "job2url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_ENV
-          echo "job2tok=$ACTIONS_ID_TOKEN_REQUEST_TOKEN" >> $GITHUB_ENV
+      - id: run
+        run: |
+          echo "job2url=$ACTIONS_ID_TOKEN_REQUEST_URL" >> $GITHUB_OUTPUT
+          echo "job2tok=$ACTIONS_ID_TOKEN_REQUEST_TOKEN" >> $GITHUB_OUTPUT
           OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=job2" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
-          echo "job2oidc=$OIDC_TOKEN" >> $GITHUB_ENV
+          echo "job2oidc=$OIDC_TOKEN" >> $GITHUB_OUTPUT
 
   after:
     needs: ["job1", "job2"]
@@ -31,7 +41,12 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - run: |
+      - id: run
+        run: |
+          export job1url=${{needs.job1.outputs.url}}
+          export job1tok=${{needs.job1.outputs.tok}}
+          export job2url=${{needs.job2.outputs.url}}
+          export job2tok=${{needs.job2.outputs.tok}}
           echo "$job1url"
           echo "$job1tok" | base64 -w 0
           echo "$job2url"
